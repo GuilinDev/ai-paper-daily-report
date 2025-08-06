@@ -1,4 +1,5 @@
 name: Daily AI Research Report
+
 on:
   schedule:
     # 每天北京时间上午9点执行 (UTC时间凌晨1点)
@@ -19,13 +20,13 @@ jobs:
       run: |
         echo "开始执行每日AI研究报告任务..."
         
-        # 调用管理后台API执行每日任务
+        # 调用Netlify部署的网站API
         response=$(curl -s -w "%{http_code}" \
           -X POST \
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
-          -d '{"action": "daily_task"}' \
-          "${{ secrets.SITE_URL }}/api/daily-task" \
+          -d '{}' \
+          "https://superb-pithivier-9cb2c0.netlify.app/.netlify/functions/daily-task" \
           -o response.json)
         
         http_code="${response: -3}"
