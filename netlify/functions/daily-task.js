@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const fetch = require('node-fetch');
 
 // 初始化Supabase客户端
 const supabaseUrl = process.env.VITE_SUPABASE_URL || process.env.SUPABASE_URL;
