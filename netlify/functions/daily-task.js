@@ -27,10 +27,10 @@ const ARXIV_CATEGORIES = [
 // 获取arXiv论文
 async function fetchArxivPapers(daysBack = 1) {
   // 使用更简单的查询，避免日期格式问题
-  // 只获取最新的机器学习论文
+  // 只获取最新的机器学习论文，减少数量以避免超时
   const query = 'cat:cs.LG';
   
-  const url = `http://export.arxiv.org/api/query?search_query=${encodeURIComponent(query)}&start=0&max_results=30&sortBy=submittedDate&sortOrder=descending`;
+  const url = `http://export.arxiv.org/api/query?search_query=${encodeURIComponent(query)}&start=0&max_results=10&sortBy=submittedDate&sortOrder=descending`;
   
   console.log('Fetching from arXiv with simple query:', url);
   
@@ -100,7 +100,7 @@ async function analyzePapersWithGemini(papers, apiKey) {
   const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
   
   const results = [];
-  const batchSize = 5;
+  const batchSize = 10; // 一次处理所有论文，避免多次调用
   
   for (let i = 0; i < papers.length; i += batchSize) {
     const batch = papers.slice(i, i + batchSize);
@@ -173,10 +173,7 @@ ArXiv ID: ${p.id}
       console.error('Error calling Gemini API:', error);
     }
     
-    // 避免过快调用API
-    if (i + batchSize < papers.length) {
-      await new Promise(resolve => setTimeout(resolve, 1000));
-    }
+    // 移除延迟以加快执行速度
   }
   
   console.log(`Analyzed ${papers.length} papers, found ${results.length} AI-related`);
@@ -255,6 +252,9 @@ ${i + 1}. ${p.summary}
 
 // 主处理函数
 exports.handler = async (event, context) => {
+  // 设置函数不等待事件循环为空就返回
+  context.callbackWaitsForEmptyEventLoop = false;
+  
   // 处理预检请求
   if (event.httpMethod === 'OPTIONS') {
     return { statusCode: 200, headers, body: '' };
@@ -270,7 +270,7 @@ exports.handler = async (event, context) => {
   }
 
   try {
-    console.log('Starting daily task...');
+    console.log('Starting daily task (optimized for 10s timeout)...');
     
     // 验证认证（可选）
     const authHeader = event.headers.authorization || event.headers.Authorization;
