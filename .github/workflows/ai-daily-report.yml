@@ -21,13 +21,16 @@ jobs:
         echo "开始执行每日AI研究报告任务..."
         
         # 调用Netlify部署的网站API
-        # 注意：请确保您的Netlify站点URL正确
+        # 使用SITE_URL构建完整的Function URL
+        FUNCTION_URL="${{ secrets.SITE_URL }}/.netlify/functions/daily-task"
+        echo "调用Function: $FUNCTION_URL"
+        
         response=$(curl -s -w "%{http_code}" \
           -X POST \
           -H "Content-Type: application/json" \
           -H "Authorization: Bearer ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}" \
           -d '{}' \
-          "${{ secrets.NETLIFY_FUNCTION_URL || 'https://superb-pithivier-9cb2c0.netlify.app/.netlify/functions/daily-task' }}" \
+          "$FUNCTION_URL" \
           -o response.json)
         
         http_code="${response: -3}"
