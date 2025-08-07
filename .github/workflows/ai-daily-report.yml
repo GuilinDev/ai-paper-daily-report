@@ -2,9 +2,9 @@ name: Daily AI Research Report
 
 on:
   schedule:
-    # 每天美国东部时间晚上11点执行 (EST 23:00 = UTC 04:00)
-    # 注意：GitHub Actions使用UTC时间
-    - cron: '0 4 * * *'
+    # 每天美国东部时间晚上11:15执行 (EST 23:15 = UTC 04:15)
+    # 注意：GitHub Actions使用UTC时间，避开整点高峰
+    - cron: '15 4 * * *'
   workflow_dispatch: # 允许手动触发
     inputs:
       force_run:
