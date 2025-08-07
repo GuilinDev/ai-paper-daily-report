@@ -26,16 +26,13 @@ const ARXIV_CATEGORIES = [
 
 // 获取arXiv论文
 async function fetchArxivPapers(daysBack = 1) {
-  const endDate = new Date();
-  const startDate = new Date();
-  startDate.setDate(startDate.getDate() - daysBack);
+  // 使用更简单的查询，避免日期格式问题
+  // 只获取最新的机器学习论文
+  const query = 'cat:cs.LG';
   
-  const categories = ARXIV_CATEGORIES.map(cat => `cat:${cat}`).join(' OR ');
-  const query = `(${categories}) AND submittedDate:[${startDate.toISOString().split('T')[0]} TO ${endDate.toISOString().split('T')[0]}]`;
+  const url = `http://export.arxiv.org/api/query?search_query=${encodeURIComponent(query)}&start=0&max_results=30&sortBy=submittedDate&sortOrder=descending`;
   
-  const url = `http://export.arxiv.org/api/query?search_query=${encodeURIComponent(query)}&sortBy=submittedDate&sortOrder=descending&max_results=50`;
-  
-  console.log('Fetching from arXiv:', url);
+  console.log('Fetching from arXiv with simple query:', url);
   
   const response = await fetch(url);
   if (!response.ok) {
